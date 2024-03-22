@@ -3,11 +3,18 @@ import execRepository from '../../app/config/db/repository';
 import { UserEntity } from '../models/entities/user.entity';
 import { UpdateUser } from '../models/interfaces/update-user.interface';
 import { User } from '../models/interfaces/user.interface';
+import bcrypt from 'bcrypt';
+import { RoleTypes } from '../models/enums/role.type';
+
+// TODO: REMOVE ROLE FROM REQUESTS
 
 const userRepository = execRepository(UserEntity);
 
-const getUsers = async (): Promise<UserEntity[]> => {
-  return (await userRepository).find();
+const getUsersCount = async (): Promise<number> => {
+  return (await userRepository).count();
+};
+const getUsers = async (query: any): Promise<UserEntity[]> => {
+  return (await userRepository).find(query);
 };
 
 const getUserById = async (id: string): Promise<UserEntity | null> => {
@@ -15,11 +22,33 @@ const getUserById = async (id: string): Promise<UserEntity | null> => {
 };
 
 const findUserByEmail = async (email: string): Promise<UserEntity | null> => {
-  return (await userRepository).findOne({ where: [{ email }] });
+  return (await userRepository)
+    .createQueryBuilder('user')
+    .addSelect('user.password')
+    .where({ email })
+    .getOne();
+};
+
+const findUserByUsername = async (
+  username: string,
+): Promise<UserEntity | null> => {
+  return (await userRepository)
+    .createQueryBuilder('user')
+    .addSelect('user.password')
+    .where({ username })
+    .getOne();
 };
 
 const createUser = async (body: User): Promise<UserEntity> => {
-  return (await userRepository).save(body);
+  const newUser = (await userRepository).create(body);
+
+  const hash = await bcrypt.hash(newUser.password, 10);
+
+  return (await userRepository).save({
+    ...newUser,
+    password: hash,
+    role: RoleTypes.USER,
+  });
 };
 
 const updateUser = async (
@@ -34,9 +63,11 @@ const deleteUser = async (id: string): Promise<DeleteResult> => {
 };
 
 export default {
+  getUsersCount,
   getUsers,
   getUserById,
   findUserByEmail,
+  findUserByUsername,
   createUser,
   updateUser,
   deleteUser,

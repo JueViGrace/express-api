@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
 import httpResponse from '../../shared/response/http.response';
 import productService from '../services/product.service';
-import { ArrayContains, Like } from 'typeorm';
+import { In, Like } from 'typeorm';
+import { pageSize, skip } from '../../shared/utils/constants';
 
 const getProducts = async (req: Request, res: Response) => {
   try {
     const searchQuery = (req.query.searchQuery as string) || '';
     const selectedCategories = (req.query.selectedCategories as string) || '';
-    const sortOption = (req.query.sortOption as string) || 'lastUpdated';
+    const sortOption = (req.query.sortOption as string) || 'updatedAt';
+    const sortAs = (req.query.sortAs as string) || 'DESC';
     const page = parseInt(req.query.page as string) || 1;
 
     let query: any = {};
@@ -17,26 +19,39 @@ const getProducts = async (req: Request, res: Response) => {
         .split(',')
         .map((category) => category);
 
-      query['where'] = [{ category: ArrayContains(categoriesArray) }];
+      query['where'] = [categoriesArray];
     }
 
     if (searchQuery) {
-      query['where'] = [
-        { productName: searchQuery },
-        { reference: searchQuery },
-        ...query['where'],
-      ];
+      query['where']
+        ? (query['where'] = [
+            {
+              productName: Like(`%${searchQuery}%`),
+              category: In([...query['where']]),
+            },
+            {
+              reference: Like(`%${searchQuery}%`),
+              category: In([...query['where']]),
+            },
+          ])
+        : (query['where'] = [
+            { productName: Like(`%${searchQuery}%`) },
+            { reference: Like(`%${searchQuery}%`) },
+          ]);
     }
 
-    const pageSize = 10;
-    const skip = (page - 1) * pageSize;
+    const where = query['where'] ? (query['where'] = [...query['where']]) : [];
 
-    const data = await productService.getPagedProducts({
-      query,
-      sortOption,
-      skip,
-      pageSize,
-    });
+    query = {
+      where,
+      order: {
+        [sortOption]: sortAs === 'DESC' ? 'DESC' : 'ASC',
+      },
+      skip: skip(page),
+      take: pageSize,
+    };
+
+    const data = await productService.getPagedProducts(query);
 
     const total = await productService.getProductCount();
 
@@ -89,13 +104,19 @@ const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
+    const existingProduct = await productService.getProductById(id);
+
+    if (!existingProduct) {
+      return httpResponse.NotFound(res, 'Product not found');
+    }
+
     const data = await productService.updateProduct(id, req.body);
 
     if (!data.affected) {
       return httpResponse.BadRequest(res, 'Failed to update product');
     }
 
-    httpResponse.Ok(res, data);
+    httpResponse.Ok(res, `Product ${id} updated`);
   } catch (error) {
     httpResponse.Error(res, error);
   }
@@ -105,13 +126,19 @@ const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
+    const existingProduct = await productService.getProductById(id);
+
+    if (!existingProduct) {
+      return httpResponse.NotFound(res, 'Product not found');
+    }
+
     const data = await productService.deleteProduct(id);
 
     if (!data.affected) {
       return httpResponse.BadRequest(res, 'Failed to delete product');
     }
 
-    httpResponse.Ok(res, data);
+    httpResponse.Ok(res, `Product ${id} deleted`);
   } catch (error) {
     httpResponse.Error(res, error);
   }

@@ -1,4 +1,4 @@
-import { Like } from 'typeorm';
+import { DeleteResult, Like, UpdateResult } from 'typeorm';
 import execRepository from '../../app/config/db/repository';
 import { ProductEntity } from '../models/entities/product.entity';
 import { Product } from '../models/interfaces/product.interface';
@@ -6,62 +6,32 @@ import { UpdateProduct } from '../models/interfaces/update-product.interface';
 
 const productRepository = execRepository(ProductEntity);
 
-const getProductCount = async () => {
+const getProductCount = async (): Promise<number> => {
   return (await productRepository).count();
 };
 
-const getPagedProducts = async ({ query, sortOption, skip, pageSize }: any) => {
-  return (await productRepository).find(
-    query,
-    //   {
-    //   where:
-    //     query
-    //       ? [
-    //           { productName: query },
-    //           { reference: query },
-    //         ]
-    //       : [],
-    //   order: {
-    //     ['updatedAt']: sortOption === 'lastUpdated' ? 'DESC' : 'ASC',
-    //   },
-    //   skip: skip,
-    //   take: pageSize,
-    //   // order: {
-    //   //   ['productName']: 'ASC',
-    //   // },
-    //   // skip: skip,
-    //   // take: pageSize,
-    // }
-  );
+const getPagedProducts = async (query: any): Promise<ProductEntity[]> => {
+  return (await productRepository).find(query);
 };
 
-const getProductById = async (id: string) => {
+const getProductById = async (id: string): Promise<ProductEntity | null> => {
   return (await productRepository).findOneBy({ id });
 };
 
-const searchProducts = async ({ query, sortOption, skip, pageSize }: any) => {
-  return (await productRepository).find({
-    where: [
-      { productName: Like(`%${query}%`) },
-      { reference: Like(`%${query}%`) },
-    ],
-    order: {
-      ['updatedAt']: sortOption === 'lastUpdated' ? 'DESC' : 'ASC',
-    },
-    skip: skip,
-    take: pageSize,
-  });
-};
-
-const createProduct = async (body: Product) => {
+const createProduct = async (
+  body: Product,
+): Promise<Product & ProductEntity> => {
   return (await productRepository).save(body);
 };
 
-const updateProduct = async (id: string, body: UpdateProduct) => {
+const updateProduct = async (
+  id: string,
+  body: UpdateProduct,
+): Promise<UpdateResult> => {
   return (await productRepository).update(id, body);
 };
 
-const deleteProduct = async (id: string) => {
+const deleteProduct = async (id: string): Promise<DeleteResult> => {
   return (await productRepository).delete(id);
 };
 
