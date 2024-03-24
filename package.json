@@ -8,7 +8,7 @@
     "build": "npm install && npx tsc",
     "start": "npm run build && node dist/server.js",
     "start:dev": "npm run build && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
-    "start:prod": "SET NODE_ENV=production && npm start",
+    "start:prod": "npm start",
     "typeorm": "npx typeorm-ts-node-commonjs -d ./src/config/data.source.ts",
     "m:gen": "npm run typeorm migration:generate",
     "m:run": "npm run typeorm migration:run",

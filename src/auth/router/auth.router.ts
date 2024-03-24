@@ -9,7 +9,7 @@ const router = Router();
 router.post(
   '/login',
   validateLogin,
-  authMiddleware.passAuth('login'),
+  authMiddleware.passAuth('local'),
   AuthController.login,
 );
 

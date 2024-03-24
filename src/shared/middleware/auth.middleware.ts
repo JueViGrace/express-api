@@ -5,7 +5,7 @@ import httpResponse from '../response/http.response';
 import passport from 'passport';
 
 const passAuth = (type: string) => {
-  return passport.authenticate(type, { session: false });
+  return passport.authenticate(type, {});
 };
 
 const checkAdminRole = (req: Request, res: Response, next: NextFunction) => {

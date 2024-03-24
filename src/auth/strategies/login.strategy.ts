@@ -6,7 +6,7 @@ const login = async (username: string, password: string, done: any) => {
   const user = await authService.validateUser(username, password);
 
   if (!user) {
-    return done(null, false, { message: 'Invalid username or password' });
+    return done(null, false, { message: 'Incorrect credentials' });
   }
 
   return done(null, user);
@@ -14,7 +14,7 @@ const login = async (username: string, password: string, done: any) => {
 
 const loginStrategy = () =>
   PassportUse<LocalStrategy, Object, VerifyFunction>(
-    'login',
+    'local',
     LocalStrategy,
     {
       usernameField: 'username',

@@ -10,6 +10,7 @@ import dotenvSetup from './dotenv.setup';
 import { TypeormStore } from 'connect-typeorm';
 import execRepository from './db/repository';
 import { SessionsEntity } from '../../shared/models/entities/session.entity';
+import passport from 'passport';
 
 const appSetup = async (): Promise<express.Application> => {
   const app = express();
@@ -42,6 +43,9 @@ const appSetup = async (): Promise<express.Application> => {
       },
     }),
   );
+
+  app.use(passport.initialize())
+    app.use(passport.session())
 
   app.use('/api', serverRoutes);
   app.use('/health', async (_req: Request, res: Response) => {
