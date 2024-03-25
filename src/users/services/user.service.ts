@@ -1,4 +1,4 @@
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult, Not, UpdateResult } from 'typeorm';
 import execRepository from '../../app/config/db/repository';
 import { UserEntity } from '../models/entities/user.entity';
 import { UpdateUser } from '../models/interfaces/update-user.interface';
@@ -14,10 +14,16 @@ const getUsersCount = async (): Promise<number> => {
   return (await userRepository).count();
 };
 const getUsers = async (query: any): Promise<UserEntity[]> => {
+  console.log(query);
+
   return (await userRepository).find(query);
 };
 
 const getUserById = async (id: string): Promise<UserEntity | null> => {
+  return (await userRepository).findOneBy({ id, role: Not(RoleTypes.ADMIN) });
+};
+
+const findUserById = async (id: string): Promise<UserEntity | null> => {
   return (await userRepository).findOneBy({ id });
 };
 
@@ -66,6 +72,7 @@ export default {
   getUsersCount,
   getUsers,
   getUserById,
+  findUserById,
   findUserByEmail,
   findUserByUsername,
   createUser,

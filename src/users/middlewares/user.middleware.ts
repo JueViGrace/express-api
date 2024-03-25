@@ -1,5 +1,10 @@
-import { body, checkExact } from 'express-validator';
+import { body, checkExact, query } from 'express-validator';
 import validation from '../../shared/middleware/validation.middleware';
+import { NextFunction, Request, Response } from 'express';
+import execRepository from '../../app/config/db/repository';
+import { UserEntity } from '../models/entities/user.entity';
+
+const userRepository = execRepository(UserEntity);
 
 export const validateUserRequest = [
   body('name')
@@ -55,3 +60,20 @@ export const validateUpdateUserRequest = [
   checkExact(),
   validation.handleValidationErrors,
 ];
+
+export const validateUpdate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const {
+    params: { id },
+    body,
+  } = req;
+
+  const query = {};
+
+  
+
+  const existingUser = (await userRepository).find({ where: [{ id: id }, {username: body.username}] });
+};

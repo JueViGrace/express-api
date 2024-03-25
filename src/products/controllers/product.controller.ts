@@ -68,9 +68,9 @@ const getProducts = async (req: Request, res: Response) => {
       },
     };
 
-    httpResponse.Ok(res, response);
+    return httpResponse.Ok(res, response);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
@@ -84,9 +84,9 @@ const getProductById = async (req: Request, res: Response) => {
       return httpResponse.NotFound(res, 'Product not found');
     }
 
-    httpResponse.Ok(res, data);
+    return httpResponse.Ok(res, data);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
@@ -94,9 +94,9 @@ const createProduct = async (req: Request, res: Response) => {
   try {
     const data = await productService.createProduct(req.body);
 
-    httpResponse.Ok(res, data);
+    return httpResponse.Ok(res, data);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
@@ -116,9 +116,9 @@ const updateProduct = async (req: Request, res: Response) => {
       return httpResponse.BadRequest(res, 'Failed to update product');
     }
 
-    httpResponse.Ok(res, `Product ${id} updated`);
+    return httpResponse.Ok(res, `Product ${id} updated`);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
@@ -138,9 +138,9 @@ const deleteProduct = async (req: Request, res: Response) => {
       return httpResponse.BadRequest(res, 'Failed to delete product');
     }
 
-    httpResponse.Ok(res, `Product ${id} deleted`);
+    return httpResponse.Ok(res, `Product ${id} deleted`);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 

@@ -4,23 +4,25 @@ import userService from '../../users/services/user.service';
 import { PayloadToken } from '../interface/auth.interface';
 import dotenvSetup from '../../app/config/dotenv.setup';
 import jwt from 'jsonwebtoken';
-import { User } from '../../users/models/interfaces/user.interface';
 
-const validateUser = async (username: string, password: string) => {
+const validateLogin = async (username: string, password: string) => {
   const userByEmail = await userService.findUserByEmail(username);
   const userByUsername = await userService.findUserByUsername(username);
 
   if (userByUsername) {
     const isMatch = await bcrypt.compare(password, userByUsername.password);
     if (isMatch) {
-      return userByUsername;
+      const { id, role, ..._user } = userByUsername;
+
+      return { id, role };
     }
   }
 
   if (userByEmail) {
     const isMatch = await bcrypt.compare(password, userByEmail.password);
     if (isMatch) {
-      return userByEmail;
+      const { id, role, ..._user } = userByEmail;
+      return { id, role };
     }
   }
 
@@ -33,15 +35,19 @@ const sign = (payload: jwt.JwtPayload, secret: any) => {
 
 const generateJWT = async (
   user: UserEntity,
-): Promise<{ accessToken: string; user: Partial<UserEntity> }> => {
-  const userConsult = await userService.getUserById(user.id);
+): Promise<{ accessToken: string; user: Partial<UserEntity> } | null> => {
+  const userConsult = await userService.findUserById(user.id);
+
+  if (!userConsult) {
+    return null;
+  }
 
   const payload: PayloadToken = {
     role: userConsult!.role,
     sub: userConsult!.id,
   };
 
-  const { password, deletedAt, role, ..._user } = user;
+  const { role, ..._user } = userConsult;
 
   return {
     accessToken: sign(payload, dotenvSetup.getEnviroment('JWT_SECRET')),
@@ -50,6 +56,6 @@ const generateJWT = async (
 };
 
 export default {
-  validateUser,
+  validateLogin,
   generateJWT,
 };

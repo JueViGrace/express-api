@@ -26,7 +26,7 @@ const login = async (req: Request, res: Response) => {
   }
 };
 
-const register = async (req: Request, res: Response) => {
+const signUp = async (req: Request, res: Response) => {
   try {
     const { body: register } = req;
 
@@ -35,18 +35,18 @@ const register = async (req: Request, res: Response) => {
       register.username,
     );
 
+    const errors: string[] = [];
+
     if (userByEmail) {
-      return httpResponse.BadRequest(
-        res,
-        'The email provided is already in use',
-      );
+      errors.push('This email is already in use.');
     }
 
     if (userByUsername) {
-      return httpResponse.BadRequest(
-        res,
-        'The username provided is already in use',
-      );
+      errors.push('This username is already in use.');
+    }
+
+    if (errors.length > 0) {
+      return httpResponse.BadRequest(res, errors);
     }
 
     const newUser = await userService.createUser(req.body);
@@ -61,7 +61,10 @@ const register = async (req: Request, res: Response) => {
       return httpResponse.Error(res, 'Error creating user');
     }
 
-    return httpResponse.Ok(res, encode);
+    res.header('Content-Type', 'application/json');
+    res.cookie('accessToken', encode.accessToken, { maxAge: 60000 * 60 });
+    res.write(JSON.stringify(encode));
+    res.end();
   } catch (error) {
     return httpResponse.Error(res, error);
   }
@@ -69,5 +72,5 @@ const register = async (req: Request, res: Response) => {
 
 export default {
   login,
-  register,
+  signUp,
 };

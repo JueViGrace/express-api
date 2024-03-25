@@ -13,7 +13,7 @@ const Config: DataSourceOptions = {
   migrations: [__dirname + '/../../../migrations/*{.ts,.js}'],
   synchronize: envSetup.getBoolEnv('DB_SYNCHRONIZE'),
   migrationsRun: true,
-  logging: envSetup.getBoolEnv('DB_LOGGIN'),
+  logging: false,
   namingStrategy: new SnakeNamingStrategy(),
 };
 

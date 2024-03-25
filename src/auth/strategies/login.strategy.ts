@@ -3,18 +3,22 @@ import authService from '../services/auth.service';
 import { PassportUse } from '../utils/passport.use';
 
 const login = async (username: string, password: string, done: any) => {
-  const user = await authService.validateUser(username, password);
+  try {
+    const user = await authService.validateLogin(username, password);
 
-  if (!user) {
-    return done(null, false, { message: 'Incorrect credentials' });
+    if (!user) {
+      return done(null, false, { messages: 'Incorrect credentials' });
+    }
+
+    return done(null, user);
+  } catch (error) {
+    return done(error);
   }
-
-  return done(null, user);
 };
 
 const loginStrategy = () =>
   PassportUse<LocalStrategy, Object, VerifyFunction>(
-    'local',
+    'login',
     LocalStrategy,
     {
       usernameField: 'username',

@@ -1,15 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserEntity } from '../../users/models/entities/user.entity';
+import passport from 'passport';
 import { RoleTypes } from '../../users/models/enums/role.type';
 import httpResponse from '../response/http.response';
-import passport from 'passport';
+import { PayloadToken } from '../../auth/interface/auth.interface';
 
 const passAuth = (type: string) => {
-  return passport.authenticate(type, {});
+  return passport.authenticate(type, {
+    session: false,
+  });
 };
 
 const checkAdminRole = (req: Request, res: Response, next: NextFunction) => {
-  const user = req.user as UserEntity;
+  const user = req.user as PayloadToken;
 
   if (!user.role || user.role !== RoleTypes.ADMIN) {
     return httpResponse.Forbidden(res, 'Forbidden resource.');
@@ -17,7 +19,17 @@ const checkAdminRole = (req: Request, res: Response, next: NextFunction) => {
   return next();
 };
 
+const checkUser = (req: Request, res: Response, next: NextFunction) => {
+  const user = req.user as PayloadToken;
+
+  if (user.sub === req.params.id || user.role === RoleTypes.ADMIN) {
+    return next();
+  }
+  return httpResponse.Forbidden(res, 'Forbidden resource.');
+};
+
 export default {
   passAuth,
   checkAdminRole,
+  checkUser,
 };

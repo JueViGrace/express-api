@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import httpResponse from '../../shared/response/http.response';
 import userService from '../services/user.service';
-import { Like } from 'typeorm';
+import { Like, Not } from 'typeorm';
 import { skip, pageSize } from '../../shared/utils/constants';
+import { RoleTypes } from '../models/enums/role.type';
+import { UserEntity } from '../models/entities/user.entity';
 
 const getUsers = async (req: Request, res: Response) => {
   try {
@@ -51,9 +53,9 @@ const getUsers = async (req: Request, res: Response) => {
       },
     };
 
-    httpResponse.Ok(res, response);
+    return httpResponse.Ok(res, response);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
@@ -67,33 +69,17 @@ const getUserById = async (req: Request, res: Response) => {
       return httpResponse.NotFound(res, 'User not found');
     }
 
-    httpResponse.Ok(res, data);
+    return httpResponse.Ok(res, data);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
-
-// const createUser = async (req: Request, res: Response) => {
-//   try {
-//     const user = await userService.findUserByEmail(req.body.email);
-
-//     if (user) {
-//       return httpResponse.BadRequest(res, 'This user already exists');
-//     }
-
-//     const data = await userService.createUser(req.body);
-
-//     httpResponse.Ok(res, data);
-//   } catch (error) {
-//     httpResponse.Error(res, error);
-//   }
-// };
 
 const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const existingUser = await userService.getUserById(id);
+    const existingUser = await userService.findUserById(id);
 
     if (!existingUser) {
       return httpResponse.NotFound(res, 'User not found');
@@ -105,9 +91,9 @@ const updateUser = async (req: Request, res: Response) => {
       return httpResponse.BadRequest(res, 'Failed to update user');
     }
 
-    httpResponse.Ok(res, `User ${id} updated`);
+    return httpResponse.Ok(res, `User ${id} updated`);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
@@ -115,7 +101,7 @@ const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const existingUser = await userService.getUserById(id);
+    const existingUser = await userService.findUserById(id);
 
     if (!existingUser) {
       return httpResponse.NotFound(res, 'User not found');
@@ -127,9 +113,9 @@ const deleteUser = async (req: Request, res: Response) => {
       return httpResponse.BadRequest(res, 'Failed to delete user');
     }
 
-    httpResponse.Ok(res, `User ${id} deleted`);
+    return httpResponse.Ok(res, `User ${id} deleted`);
   } catch (error) {
-    httpResponse.Error(res, error);
+    return httpResponse.Error(res, error);
   }
 };
 
