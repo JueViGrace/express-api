@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../app/config/db/base.entity';
+import { OrderItemEntity } from '../../../orders/models/entities/order-item.entity';
 
 @Entity({ name: 'product' })
 export class ProductEntity extends BaseEntity {
@@ -20,9 +21,6 @@ export class ProductEntity extends BaseEntity {
   @Column()
   category: string;
 
-  //   @OneToMany(
-  //     () => PurchaseProductEntity,
-  //     (purchaseProduct) => purchaseProduct.product,
-  //   )
-  //   purchaseProduct: PurchaseProductEntity[];
+  @OneToMany(() => OrderItemEntity, (orderItem) => orderItem.product)
+  orderItems: OrderItemEntity[];
 }

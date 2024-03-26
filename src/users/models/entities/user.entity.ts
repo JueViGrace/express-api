@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToOne } from 'typeorm';
 import { BaseEntity } from '../../../app/config/db/base.entity';
 import { RoleTypes } from '../enums/role.type';
+import { CustomerEntity } from '../../../customers/models/entities/customer.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends BaseEntity {
@@ -33,6 +34,6 @@ export class UserEntity extends BaseEntity {
   })
   role: RoleTypes;
 
-  //   @OneToOne(() => CustomerEntity, (customer) => customer.user)
-  //   customer: CustomerEntity;
+  @OneToOne(() => CustomerEntity, (customer) => customer.user)
+  customer: CustomerEntity;
 }

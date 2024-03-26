@@ -18,9 +18,11 @@ const getProductById = async (id: string): Promise<ProductEntity | null> => {
   return (await productRepository).findOneBy({ id });
 };
 
-const createProduct = async (
-  body: Product,
-): Promise<Product & ProductEntity> => {
+const findProductByReference = async (reference: string) => {
+  return (await productRepository).find({ where: [{ reference }] });
+};
+
+const createProduct = async (body: Product): Promise<ProductEntity> => {
   return (await productRepository).save(body);
 };
 
@@ -39,6 +41,7 @@ export default {
   getProductCount,
   getPagedProducts,
   getProductById,
+  findProductByReference,
   createProduct,
   updateProduct,
   deleteProduct,

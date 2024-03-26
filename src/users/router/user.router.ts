@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import UsersController from '../controllers/users.controller';
-import { validateUpdateUserRequest } from '../middlewares/user.middleware';
+import { checkExistingData, validateUpdateUserRequest } from '../middlewares/user.middleware';
 import {
   validateIdParam,
   validateQueryParams,
@@ -16,17 +16,14 @@ router.get(
   UsersController.getUsers,
 );
 
-router.get(
-  '/:id',
-  validateIdParam,
-  UsersController.getUserById,
-);
+router.get('/:id', validateIdParam, UsersController.getUserById);
 
 router.patch(
   '/update/:id',
   authMiddleware.checkUser,
   validateIdParam,
   validateUpdateUserRequest,
+  checkExistingData,
   UsersController.updateUser,
 );
 

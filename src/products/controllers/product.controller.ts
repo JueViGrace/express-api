@@ -92,9 +92,18 @@ const getProductById = async (req: Request, res: Response) => {
 
 const createProduct = async (req: Request, res: Response) => {
   try {
+    const { reference } = req.body;
+
+    const existingReference =
+      await productService.findProductByReference(reference);
+
+    if (existingReference.length > 0) {
+      return httpResponse.BadRequest(res, 'Reference already in use.');
+    }
+
     const data = await productService.createProduct(req.body);
 
-    return httpResponse.Ok(res, data);
+    return httpResponse.Created(res, data);
   } catch (error) {
     return httpResponse.Error(res, error);
   }
@@ -103,6 +112,15 @@ const createProduct = async (req: Request, res: Response) => {
 const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+
+    const { reference } = req.body;
+
+    const existingReference =
+      await productService.findProductByReference(reference);
+
+    if (existingReference) {
+      return httpResponse.BadRequest(res, 'Reference already in use.');
+    }
 
     const existingProduct = await productService.getProductById(id);
 

@@ -12,6 +12,11 @@ export const validateProductRequest = [
     .withMessage('description must be a string')
     .notEmpty()
     .withMessage('description must not be empty'),
+  body('reference')
+    .isString()
+    .withMessage('reference must be a string')
+    .notEmpty()
+    .withMessage('reference must not be empty'),
   body('price')
     .isNumeric()
     .withMessage('price must be a number')

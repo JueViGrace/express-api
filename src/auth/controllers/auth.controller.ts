@@ -3,6 +3,7 @@ import httpResponse from '../../shared/response/http.response';
 import { UserEntity } from '../../users/models/entities/user.entity';
 import authService from '../services/auth.service';
 import userService from '../../users/services/user.service';
+import customerService from '../../customers/services/customer.service';
 
 const login = async (req: Request, res: Response) => {
   try {
@@ -50,6 +51,7 @@ const signUp = async (req: Request, res: Response) => {
     }
 
     const newUser = await userService.createUser(req.body);
+    await customerService.createCustomer({ user: newUser });
 
     if (!newUser) {
       return httpResponse.BadRequest(res, 'Failed to create user');
