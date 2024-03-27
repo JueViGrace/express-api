@@ -44,6 +44,7 @@ const generateJWT = async (
 
   const payload: PayloadToken = {
     role: userConsult!.role,
+    customerId: userConsult!.customer.id,
     sub: userConsult!.id,
   };
 

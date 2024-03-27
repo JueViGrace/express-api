@@ -1,6 +1,6 @@
 export enum PaymentMethod {
   TRANSFER = 'TRANSFER',
   CASH = 'CASH',
-  PAGOMOVIL = 'PAGO MOVIL',
+  MOBILE_PAYMENT = 'MOBILE PAYMENT',
   STRIPE = 'STRIPE',
 }

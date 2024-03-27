@@ -4,7 +4,7 @@ import userService from '../services/user.service';
 import { Like } from 'typeorm';
 import { skip, pageSize } from '../../shared/utils/constants';
 import customerService from '../../customers/services/customer.service';
-import { Customer } from './../../customers/models/interfaces/customer.interface';
+import { PayloadToken } from '../../auth/interface/auth.interface';
 
 const getUsers = async (req: Request, res: Response) => {
   try {
@@ -65,10 +65,6 @@ const getUserById = async (req: Request, res: Response) => {
 
     const data = await userService.getUserById(id);
 
-    if (!data) {
-      return httpResponse.NotFound(res, 'User not found');
-    }
-
     return httpResponse.Ok(res, data);
   } catch (error) {
     return httpResponse.Error(res, error);
@@ -82,6 +78,8 @@ const updateUser = async (req: Request, res: Response) => {
       body: { username, email, name, lastname, customer },
     } = req;
 
+    const user = req.user as PayloadToken;
+
     const data = await userService.updateUser(id, {
       username,
       email,
@@ -89,7 +87,7 @@ const updateUser = async (req: Request, res: Response) => {
       lastname,
     });
 
-    const customerData = await customerService.updateCustomer(customer.id, {
+    const customerData = await customerService.updateCustomer(user.customerId, {
       city: customer.city,
       state: customer.state,
       dni: customer.dni,
@@ -115,19 +113,13 @@ const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const existingUser = await userService.findUserById(id);
-
-    if (!existingUser) {
-      return httpResponse.NotFound(res, 'User not found');
-    }
-
     const data = await userService.deleteUser(id);
 
     if (!data.affected) {
-      return httpResponse.BadRequest(res, 'Failed to delete user');
+      return httpResponse.BadRequest(res, 'Failed to delete user.');
     }
 
-    return httpResponse.Ok(res, `User ${id} deleted`);
+    return httpResponse.Ok(res, 'User deleted');
   } catch (error) {
     return httpResponse.Error(res, error);
   }

@@ -4,7 +4,5 @@ import { PaymentMethod } from '../enums/payment-method.enum';
 
 export interface UpdateOrder {
   status?: OrderStatus;
-  paymentMethod?: PaymentMethod;
-  totalAmount?: number;
   customer?: CustomerEntity;
 }

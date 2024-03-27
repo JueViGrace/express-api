@@ -16,21 +16,17 @@ const handleValidationErrors = async (
   next();
 };
 
-export const validateIdParam = [
+const validateIdParam = [
   param('id')
     .isString()
     .trim()
     .notEmpty()
+    .isUUID()
     .withMessage('id paramenter must be a valid string'),
   handleValidationErrors,
 ];
 
-export default {
-  handleValidationErrors,
-  validateIdParam,
-};
-
-export const validateQueryParams = [
+const validateQueryParams = [
   query('page')
     .isInt({ min: 1 })
     .withMessage('Page query param must be an integer and greater than 0')
@@ -56,3 +52,9 @@ export const validateQueryParams = [
     .optional(),
   handleValidationErrors,
 ];
+
+export default {
+  handleValidationErrors,
+  validateIdParam,
+  validateQueryParams,
+};

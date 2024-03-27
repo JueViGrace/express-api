@@ -1,20 +1,27 @@
 import { Router } from 'express';
+import authMiddleware from '../../shared/middleware/auth.middleware';
+import validationMiddleware from '../../shared/middleware/validation.middleware';
 import productController from '../controllers/product.controller';
 import {
+  checkProductData,
   validateProductRequest,
   validateUpdateProductRequest,
 } from '../middleware/product.middleware';
-import {
-  validateIdParam,
-  validateQueryParams,
-} from '../../shared/middleware/validation.middleware';
-import authMiddleware from '../../shared/middleware/auth.middleware';
 
 const router = Router();
 
-router.get('/', validateQueryParams, productController.getProducts);
+router.get(
+  '/',
+  validationMiddleware.validateQueryParams,
+  productController.getProducts,
+);
 
-router.get('/:id', validateIdParam, productController.getProductById);
+router.get(
+  '/:id',
+  validationMiddleware.validateIdParam,
+  checkProductData,
+  productController.getProductById,
+);
 
 router.post(
   '/create',
@@ -28,7 +35,7 @@ router.patch(
   '/update/:id',
   authMiddleware.passAuth('jwt'),
   authMiddleware.checkAdminRole,
-  validateIdParam,
+  validationMiddleware.validateIdParam,
   validateUpdateProductRequest,
   productController.updateProduct,
 );
@@ -37,7 +44,8 @@ router.delete(
   '/delete/:id',
   authMiddleware.passAuth('jwt'),
   authMiddleware.checkAdminRole,
-  validateIdParam,
+  validationMiddleware.validateIdParam,
+  checkProductData,
   productController.deleteProduct,
 );
 

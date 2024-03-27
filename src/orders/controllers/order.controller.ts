@@ -7,11 +7,12 @@ import { OrderStatus } from '../models/enums/order-status.enum';
 import { OrderItem } from '../models/interfaces/order-items.interface';
 import orderService from '../services/order.service';
 import orderItemService from '../services/order-item.service';
+import { RoleTypes } from '../../users/models/enums/role.type';
 
 const getOrders = async (req: Request, res: Response) => {
   try {
     const user = req.user as PayloadToken;
-    const selectedStatus = (req.query.selectedStatus as string) || 'all';
+    const selectedStatus = (req.query.selectedStatus as string) || '';
     const sortOption = (req.query.sortOption as string) || 'updatedAt';
     const sortAs = (req.query.sortAs as string) || 'DESC';
     const page = parseInt(req.query.page as string) || 1;
@@ -24,12 +25,29 @@ const getOrders = async (req: Request, res: Response) => {
       query['where'] = [{ status: In(statusArray) }];
     }
 
-    const where = query['where']
-      ? (query['where'] = [{ customer: { id: user.sub } }, ...query['where']])
-      : [{ customer: { id: user.sub } }];
+    const adminWhere = query['where']
+      ? (query['where'] = [...query['where']])
+      : [];
+
+    const usersWhere = query['where']
+      ? (query['where'] = [
+          { customer: { id: user.customerId } },
+          ...query['where'],
+        ])
+      : [{ customer: { id: user.customerId } }];
+
+    const where = user.role === RoleTypes.ADMIN ? adminWhere : usersWhere;
 
     query = {
       where,
+      relations: {
+        customer: {
+          user: true,
+        },
+        orderItems: {
+          product: true,
+        },
+      },
       order: {
         [sortOption]: sortAs === 'DESC' ? 'DESC' : 'ASC',
       },
@@ -65,11 +83,7 @@ const getOrderById = async (req: Request, res: Response) => {
     const { id } = req.params;
     const user = req.user as PayloadToken;
 
-    const data = await orderService.getOrderById(id, user.sub);
-
-    if (!data) {
-      return httpResponse.NotFound(res, 'Order not found');
-    }
+    const data = await orderService.getOrderById(id, user.customerId);
 
     return httpResponse.Ok(res, data);
   } catch (error) {
@@ -79,7 +93,7 @@ const getOrderById = async (req: Request, res: Response) => {
 
 const createOrder = async (req: Request, res: Response) => {
   try {
-    const { orderItems, customer, paymentMethod } = req.body;
+    const { orderItems, ..._body } = req.body;
 
     let totalAmount: number = 0;
 
@@ -90,17 +104,22 @@ const createOrder = async (req: Request, res: Response) => {
     const data = await orderService.createOrder({
       totalAmount: totalAmount,
       status: OrderStatus.PLACED,
-      customer,
-      paymentMethod,
+      ..._body,
     });
 
-    const orderItemData = await orderItemService.createOrderItem({
-      order: { id: data.id },
-      ...orderItems,
-    });
+    for (const item of orderItems) {
+      const itemdata = await orderItemService.createOrderItem({
+        order: { id: data.id },
+        ...item,
+      });
 
-    if (!data || !orderItemData) {
-      return httpResponse.BadRequest(res, 'Failed to create order');
+      if (!itemdata) {
+        return httpResponse.BadRequest(res, 'Failed to create order.');
+      }
+    }
+
+    if (!data) {
+      return httpResponse.BadRequest(res, 'Failed to create order.');
     }
 
     return httpResponse.Created(res, 'Order created');
@@ -111,6 +130,15 @@ const createOrder = async (req: Request, res: Response) => {
 
 const updateOrder = async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
+
+    const data = await orderService.updateOrder(id, req.body);
+
+    if (!data.affected) {
+      return httpResponse.BadRequest(res, 'Failed to update order');
+    }
+
+    return httpResponse.Ok(res, data);
   } catch (error) {
     return httpResponse.Error(res, error);
   }
@@ -118,6 +146,15 @@ const updateOrder = async (req: Request, res: Response) => {
 
 const deleteOrder = async (req: Request, res: Response) => {
   try {
+    const { id } = req.params;
+
+    const data = await orderService.deleteOrder(id);
+
+    if (!data.affected) {
+      return httpResponse.BadRequest(res, 'Failed to update order');
+    }
+
+    return httpResponse.Ok(res, data);
   } catch (error) {
     return httpResponse.Error(res, error);
   }

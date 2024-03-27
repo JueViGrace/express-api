@@ -23,7 +23,7 @@ const validate = async (payload: PayloadToken, done: VerifiedCallback) => {
       return done(null, false, { messages: "User doesn't exists" });
     }
 
-    request.user = user
+    // request.user = user
     return done(null, payload);
   } catch (err) {
     done(err);

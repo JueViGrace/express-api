@@ -1,36 +1,41 @@
 import { Router } from 'express';
-import UsersController from '../controllers/users.controller';
-import { checkExistingData, validateUpdateUserRequest } from '../middlewares/user.middleware';
-import {
-  validateIdParam,
-  validateQueryParams,
-} from '../../shared/middleware/validation.middleware';
 import authMiddleware from '../../shared/middleware/auth.middleware';
+import validationMiddleware from '../../shared/middleware/validation.middleware';
+import UsersController from '../controllers/users.controller';
+import {
+  checkUserData,
+  validateUpdateUserRequest,
+} from '../middlewares/user.middleware';
 
 const router = Router();
 
 router.get(
   '/',
   authMiddleware.checkAdminRole,
-  validateQueryParams,
+  validationMiddleware.validateQueryParams,
   UsersController.getUsers,
 );
 
-router.get('/:id', validateIdParam, UsersController.getUserById);
+router.get(
+  '/:id',
+  validationMiddleware.validateIdParam,
+  checkUserData,
+  UsersController.getUserById,
+);
 
 router.patch(
   '/update/:id',
+  validationMiddleware.validateIdParam,
   authMiddleware.checkUser,
-  validateIdParam,
   validateUpdateUserRequest,
-  checkExistingData,
   UsersController.updateUser,
 );
 
 router.delete(
   '/delete/:id',
   authMiddleware.checkAdminRole,
-  validateIdParam,
+  validationMiddleware.validateIdParam,
+  checkUserData,
   UsersController.deleteUser,
 );
 

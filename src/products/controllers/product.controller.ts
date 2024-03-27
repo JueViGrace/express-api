@@ -80,10 +80,6 @@ const getProductById = async (req: Request, res: Response) => {
 
     const data = await productService.getProductById(id);
 
-    if (!data) {
-      return httpResponse.NotFound(res, 'Product not found');
-    }
-
     return httpResponse.Ok(res, data);
   } catch (error) {
     return httpResponse.Error(res, error);
@@ -92,15 +88,6 @@ const getProductById = async (req: Request, res: Response) => {
 
 const createProduct = async (req: Request, res: Response) => {
   try {
-    const { reference } = req.body;
-
-    const existingReference =
-      await productService.findProductByReference(reference);
-
-    if (existingReference.length > 0) {
-      return httpResponse.BadRequest(res, 'Reference already in use.');
-    }
-
     const data = await productService.createProduct(req.body);
 
     return httpResponse.Created(res, data);
@@ -113,28 +100,13 @@ const updateProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const { reference } = req.body;
-
-    const existingReference =
-      await productService.findProductByReference(reference);
-
-    if (existingReference) {
-      return httpResponse.BadRequest(res, 'Reference already in use.');
-    }
-
-    const existingProduct = await productService.getProductById(id);
-
-    if (!existingProduct) {
-      return httpResponse.NotFound(res, 'Product not found');
-    }
-
     const data = await productService.updateProduct(id, req.body);
 
     if (!data.affected) {
       return httpResponse.BadRequest(res, 'Failed to update product');
     }
 
-    return httpResponse.Ok(res, `Product ${id} updated`);
+    return httpResponse.Ok(res, 'Product updated');
   } catch (error) {
     return httpResponse.Error(res, error);
   }
@@ -144,19 +116,13 @@ const deleteProduct = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const existingProduct = await productService.getProductById(id);
-
-    if (!existingProduct) {
-      return httpResponse.NotFound(res, 'Product not found');
-    }
-
     const data = await productService.deleteProduct(id);
 
     if (!data.affected) {
       return httpResponse.BadRequest(res, 'Failed to delete product');
     }
 
-    return httpResponse.Ok(res, `Product ${id} deleted`);
+    return httpResponse.Ok(res, 'Product deleted');
   } catch (error) {
     return httpResponse.Error(res, error);
   }

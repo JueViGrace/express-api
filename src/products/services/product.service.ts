@@ -15,7 +15,7 @@ const getPagedProducts = async (query: any): Promise<ProductEntity[]> => {
 };
 
 const getProductById = async (id: string): Promise<ProductEntity | null> => {
-  return (await productRepository).findOneBy({ id });
+  return (await productRepository).findOne({ where: [{ id }] });
 };
 
 const findProductByReference = async (reference: string) => {

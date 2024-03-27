@@ -1,4 +1,4 @@
-import { UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import execRepository from '../../app/config/db/repository';
 import { OrderEntity } from '../models/entities/order.entity';
 import { Order } from '../models/interfaces/order.interface';
@@ -20,9 +20,14 @@ const getOrderById = async (
   id: string,
   customerId: string,
 ): Promise<OrderEntity | null> => {
-  return (await orderRepository).findOneBy({
-    id,
-    customer: { id: customerId },
+  return (await orderRepository).findOne({
+    where: [{ id, customer: { id: customerId } }],
+    relations: {
+      customer: true,
+      orderItems: {
+        product: true,
+      },
+    },
   });
 };
 
@@ -37,8 +42,8 @@ const updateOrder = async (
   return (await orderRepository).update(id, body);
 };
 
-const deleteOrder = async (id: string) => {
-  return;
+const deleteOrder = async (id: string): Promise<DeleteResult> => {
+  return (await orderRepository).delete(id);
 };
 
 export default {

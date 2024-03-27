@@ -1,5 +1,43 @@
+import { NextFunction, Request, Response } from 'express';
 import { body, checkExact } from 'express-validator';
 import validation from '../../shared/middleware/validation.middleware';
+import httpResponse from '../../shared/response/http.response';
+import productService from '../services/product.service';
+
+export const checkProductData = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { id } = req.params;
+
+    if (id) {
+      const existingProduct = await productService.getProductById(id);
+
+      if (!existingProduct) {
+        return httpResponse.NotFound(res, 'Product not found.');
+      }
+    }
+
+    const { reference } = req.body;
+
+    if (reference) {
+      const validReference =
+        await productService.findProductByReference(reference);
+
+      const valid = validReference.filter((product) => product.id !== id);
+
+      if (valid.length > 0) {
+        return httpResponse.BadRequest(res, 'Reference already in use.');
+      }
+    }
+
+    next();
+  } catch (error) {
+    return httpResponse.Error(res, error);
+  }
+};
 
 export const validateProductRequest = [
   body('productName')
@@ -29,6 +67,7 @@ export const validateProductRequest = [
     .withMessage('category must not be empty'),
   checkExact(),
   validation.handleValidationErrors,
+  checkProductData
 ];
 
 export const validateUpdateProductRequest = [
@@ -48,6 +87,11 @@ export const validateUpdateProductRequest = [
     .notEmpty()
     .withMessage('price must not be empty')
     .optional(),
+  body('reference')
+    .isString()
+    .withMessage('reference must be a string')
+    .notEmpty()
+    .withMessage('reference must not be empty'),
   body('category')
     .isString()
     .withMessage('category must be a string')
@@ -56,4 +100,5 @@ export const validateUpdateProductRequest = [
     .optional(),
   checkExact(),
   validation.handleValidationErrors,
+  checkProductData
 ];

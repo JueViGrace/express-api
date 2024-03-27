@@ -29,27 +29,6 @@ const login = async (req: Request, res: Response) => {
 
 const signUp = async (req: Request, res: Response) => {
   try {
-    const { body: register } = req;
-
-    const userByEmail = await userService.findUserByEmail(register.email);
-    const userByUsername = await userService.findUserByUsername(
-      register.username,
-    );
-
-    const errors: string[] = [];
-
-    if (userByEmail) {
-      errors.push('This email is already in use.');
-    }
-
-    if (userByUsername) {
-      errors.push('This username is already in use.');
-    }
-
-    if (errors.length > 0) {
-      return httpResponse.BadRequest(res, errors);
-    }
-
     const newUser = await userService.createUser(req.body);
     await customerService.createCustomer({ user: newUser });
 
