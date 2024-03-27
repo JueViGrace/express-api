@@ -67,7 +67,7 @@ export const validateProductRequest = [
     .withMessage('category must not be empty'),
   checkExact(),
   validation.handleValidationErrors,
-  checkProductData
+  checkProductData,
 ];
 
 export const validateUpdateProductRequest = [
@@ -100,5 +100,5 @@ export const validateUpdateProductRequest = [
     .optional(),
   checkExact(),
   validation.handleValidationErrors,
-  checkProductData
+  checkProductData,
 ];

@@ -19,11 +19,7 @@ router.get(
   orderController.getOrderById,
 );
 
-router.post(
-  '/create',
-  validateOrderRequest,
-  orderController.createOrder,
-);
+router.post('/create', validateOrderRequest, orderController.createOrder);
 
 router.patch(
   '/update/:id',

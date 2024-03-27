@@ -8,4 +8,4 @@ const execRepository = async <T extends ObjectLiteral>(
   return dataSource.getRepository(e);
 };
 
-export default execRepository
+export default execRepository;
