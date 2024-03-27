@@ -12,7 +12,7 @@ const validateLogin = async (username: string, password: string) => {
   if (userByUsername) {
     const isMatch = await bcrypt.compare(password, userByUsername.password);
     if (isMatch) {
-      const { id, role, ..._user } = userByUsername;
+      const { id, role } = userByUsername;
 
       return { id, role };
     }
@@ -21,7 +21,7 @@ const validateLogin = async (username: string, password: string) => {
   if (userByEmail) {
     const isMatch = await bcrypt.compare(password, userByEmail.password);
     if (isMatch) {
-      const { id, role, ..._user } = userByEmail;
+      const { id, role } = userByEmail;
       return { id, role };
     }
   }

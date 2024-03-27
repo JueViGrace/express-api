@@ -58,7 +58,7 @@ const getOrders = async (req: Request, res: Response) => {
     const data = await orderService.getOrders(query);
 
     if (data.length === 0) {
-      return httpResponse.NotFound(res, 'Orders not found');
+      return httpResponse.NotFound(res, 'Orders not found.');
     }
 
     const total = await orderService.getOrdersCount(user.sub);
@@ -122,7 +122,7 @@ const createOrder = async (req: Request, res: Response) => {
       return httpResponse.BadRequest(res, 'Failed to create order.');
     }
 
-    return httpResponse.Created(res, 'Order created');
+    return httpResponse.Created(res, 'Order created!');
   } catch (error) {
     return httpResponse.Error(res, error);
   }
@@ -135,7 +135,7 @@ const updateOrder = async (req: Request, res: Response) => {
     const data = await orderService.updateOrder(id, req.body);
 
     if (!data.affected) {
-      return httpResponse.BadRequest(res, 'Failed to update order');
+      return httpResponse.BadRequest(res, 'Failed to update order.');
     }
 
     return httpResponse.Ok(res, data);
@@ -151,7 +151,7 @@ const deleteOrder = async (req: Request, res: Response) => {
     const data = await orderService.deleteOrder(id);
 
     if (!data.affected) {
-      return httpResponse.BadRequest(res, 'Failed to update order');
+      return httpResponse.BadRequest(res, 'Failed to delete order.');
     }
 
     return httpResponse.Ok(res, data);

@@ -39,7 +39,7 @@ const getUsers = async (req: Request, res: Response) => {
     const data = await userService.getUsers(query);
 
     if (data.length === 0) {
-      return httpResponse.NotFound(res, 'Users not found');
+      return httpResponse.NotFound(res, 'Users not found.');
     }
 
     const total = await userService.getUsersCount();
@@ -119,7 +119,7 @@ const deleteUser = async (req: Request, res: Response) => {
       return httpResponse.BadRequest(res, 'Failed to delete user.');
     }
 
-    return httpResponse.Ok(res, 'User deleted');
+    return httpResponse.Ok(res, 'User deleted!');
   } catch (error) {
     return httpResponse.Error(res, error);
   }

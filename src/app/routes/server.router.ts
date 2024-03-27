@@ -11,7 +11,5 @@ router.use('/auth', authRouter);
 router.use('/users', authMiddleware.passAuth('jwt'), usersRouter);
 router.use('/products', productRouter);
 router.use('/orders', authMiddleware.passAuth('jwt'), orderRouter);
-// router.use('/customer')
-// router.use('/categories')
 
 export default router;

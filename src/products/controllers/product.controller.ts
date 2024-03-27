@@ -56,7 +56,7 @@ const getProducts = async (req: Request, res: Response) => {
     const total = await productService.getProductCount();
 
     if (data.length === 0) {
-      return httpResponse.NotFound(res, 'Products not found');
+      return httpResponse.NotFound(res, 'Products not found.');
     }
 
     const response = {
@@ -90,6 +90,10 @@ const createProduct = async (req: Request, res: Response) => {
   try {
     const data = await productService.createProduct(req.body);
 
+    if (!data) {
+      return httpResponse.BadRequest(res, 'Failed to create product.');
+    }
+
     return httpResponse.Created(res, data);
   } catch (error) {
     return httpResponse.Error(res, error);
@@ -103,10 +107,10 @@ const updateProduct = async (req: Request, res: Response) => {
     const data = await productService.updateProduct(id, req.body);
 
     if (!data.affected) {
-      return httpResponse.BadRequest(res, 'Failed to update product');
+      return httpResponse.BadRequest(res, 'Failed to update product.');
     }
 
-    return httpResponse.Ok(res, 'Product updated');
+    return httpResponse.Ok(res, 'Product updated.');
   } catch (error) {
     return httpResponse.Error(res, error);
   }
@@ -119,10 +123,10 @@ const deleteProduct = async (req: Request, res: Response) => {
     const data = await productService.deleteProduct(id);
 
     if (!data.affected) {
-      return httpResponse.BadRequest(res, 'Failed to delete product');
+      return httpResponse.BadRequest(res, 'Failed to delete product.');
     }
 
-    return httpResponse.Ok(res, 'Product deleted');
+    return httpResponse.Ok(res, 'Product deleted.');
   } catch (error) {
     return httpResponse.Error(res, error);
   }

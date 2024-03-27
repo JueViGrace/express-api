@@ -10,7 +10,6 @@ import orderService from '../services/order.service';
 import { PaymentMethod } from '../models/enums/payment-method.enum';
 import { OrderStatus } from '../models/enums/order-status.enum';
 
-// TODO: revisar si cliente y productos añadidos existen
 export const checkOrderData = async (
   req: Request,
   res: Response,
@@ -65,7 +64,7 @@ export const checkOrderData = async (
       const payment = keys.filter((key) => key === paymentMethod);
 
       if (payment.length === 0) {
-        errors.push('Incorrect payment method');
+        errors.push('Incorrect payment method.');
       }
     }
 
@@ -90,7 +89,7 @@ export const checkOrderData = async (
       console.log(payment);
 
       if (payment.length === 0) {
-        errors.push('Incorrect order status');
+        errors.push('Incorrect order status.');
       }
     }
 

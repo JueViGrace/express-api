@@ -9,7 +9,6 @@ import { PayloadToken } from '../interface/auth.interface';
 import { PassportUse } from '../utils/passport.use';
 import dotenvSetup from '../../app/config/dotenv.setup';
 import userService from '../../users/services/user.service';
-import { request } from 'express';
 
 const validate = async (payload: PayloadToken, done: VerifiedCallback) => {
   try {
@@ -23,7 +22,6 @@ const validate = async (payload: PayloadToken, done: VerifiedCallback) => {
       return done(null, false, { messages: "User doesn't exists" });
     }
 
-    // request.user = user
     return done(null, payload);
   } catch (err) {
     done(err);

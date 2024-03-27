@@ -13,5 +13,5 @@ async function serverBootstrap() {
 serverBootstrap().then(() => {
   console.log(`
         [server]: Server is running at http://${HOST}:${PORT}
-        `);
+  `);
 });
