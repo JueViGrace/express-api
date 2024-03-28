@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  jvg_db:
+  bakery_db:
     image: mysql:8.0
     volumes:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -8,10 +8,10 @@ services:
     ports:
       - '3308:3306'
     environment:
-      MYSQL_DATABASE: jvg_db
+      MYSQL_DATABASE: bakery_db
       MYSQL_ROOT_USER: jvg_25
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: jvg_25
       MYSQL_PASSWORD: root
-    container_name: jvg_container
+    container_name: bakery_container
     restart: always
