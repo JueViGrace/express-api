@@ -19,8 +19,14 @@ const Config: DataSourceOptions = {
 
 const AppDataSource: DataSource = new DataSource(Config);
 
-const dbConnect = async (): Promise<DataSource> => {
-  return await AppDataSource.initialize();
+const dbConnect = async () => {
+  try {
+    const dataSource = await AppDataSource.initialize();
+    return dataSource
+  } catch (error) {
+    console.log(error);
+    dbConnect()
+  }
 };
 
 export default dbConnect;
